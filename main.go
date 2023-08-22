@@ -2,15 +2,29 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/maxilovera/go-crud-example/handlers"
+	"github.com/maxilovera/objects/handlers"
+)
+
+var (
+	aulaHandler *handlers.AulaHandler
+	router      *gin.Engine
 )
 
 func main() {
-	r := gin.Default()
+	router = gin.Default()
+	//Iniciar objetos de handler
+	iniciar()
 
-	r.GET("/personas", handlers.ObtenerPersonas)
-	r.GET("/personas/:id", handlers.ObtenerPersonaPorId)
-	r.POST("/personas", handlers.CrearPersona)
+	mapping()
 
-	r.Run(":8080")
+	router.Run(":8080")
+}
+
+func mapping() {
+	//Listado de rutas
+	router.GET("/aulas", aulaHandler.ObtenerAulas)
+}
+
+func iniciar() {
+	aulaHandler = handlers.NewAulaHandler()
 }
