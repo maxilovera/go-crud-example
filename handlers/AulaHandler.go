@@ -4,28 +4,36 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/maxilovera/go-crud-example/dto"
 	"github.com/maxilovera/go-crud-example/services"
 )
 
 type AulaHandler struct {
-	aulaService services.AulaService
+	aulaService services.AulaInterface
 }
 
-func NewAulaHandler() *AulaHandler {
+func NewAulaHandler(aulaService services.AulaInterface) *AulaHandler {
 	return &AulaHandler{
-		aulaService: *services.NewAulaService(),
+		aulaService: aulaService,
 	}
 }
 
-func (handler AulaHandler) ObtenerAulas(c *gin.Context) {
+func (handler *AulaHandler) ObtenerAulas(c *gin.Context) {
 	aulas := handler.aulaService.ObtenerAulas()
 
-	contentType := c.Request.Header.Get("content-type")
+	c.JSON(http.StatusOK, aulas)
+}
 
-	if contentType == "application/xml" {
-		c.XML(http.StatusOK, aulas)
+func (handler *AulaHandler) InsertarAula(c *gin.Context) {
+	var aula dto.Aula
+
+	if err := c.ShouldBindJSON(&aula); err != nil {
+		// Si hay un error en el JSON, devuelve un error
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, aulas)
+	resultado := handler.aulaService.InsertarAula(&aula)
+
+	c.JSON(http.StatusCreated, resultado)
 }
