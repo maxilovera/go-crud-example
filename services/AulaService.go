@@ -3,11 +3,15 @@ package services
 import (
 	"github.com/maxilovera/go-crud-example/dto"
 	"github.com/maxilovera/go-crud-example/repositories"
+	"github.com/maxilovera/go-crud-example/utils"
 )
 
 type AulaInterface interface {
 	ObtenerAulas() []*dto.Aula
+	ObtenerAulaPorID(id string) *dto.Aula
+	EliminarAula(id string) bool
 	InsertarAula(aula *dto.Aula) bool
+	ModificarAula(aula *dto.Aula) bool
 }
 
 type AulaService struct {
@@ -32,8 +36,31 @@ func (service *AulaService) ObtenerAulas() []*dto.Aula {
 	return aulas
 }
 
+func (service *AulaService) ObtenerAulaPorID(id string) *dto.Aula {
+	aulaDB, err := service.aulaRepository.ObtenerAulaPorID(id)
+
+	var aula *dto.Aula
+	if err == nil {
+		aula = dto.NewAula(aulaDB)
+	}
+
+	return aula
+}
+
 func (service *AulaService) InsertarAula(aula *dto.Aula) bool {
 	service.aulaRepository.InsertarAula(aula.GetModel())
+
+	return true
+}
+
+func (service *AulaService) ModificarAula(aula *dto.Aula) bool {
+	service.aulaRepository.ModificarAula(aula.GetModel())
+
+	return true
+}
+
+func (service *AulaService) EliminarAula(id string) bool {
+	service.aulaRepository.EliminarAula(utils.GetObjectIDFromStringID(id))
 
 	return true
 }

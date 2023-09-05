@@ -25,7 +25,10 @@ func main() {
 func mappingRoutes() {
 	//Listado de rutas
 	router.GET("/aulas", aulaHandler.ObtenerAulas)
+	router.GET("/aulas/:id", aulaHandler.ObtenerAulaPorID)
 	router.POST("/aulas", aulaHandler.InsertarAula)
+	router.PUT("/aulas/:id", aulaHandler.ModificarAula)
+	router.DELETE("/aulas/:id", aulaHandler.EliminarAula)
 }
 
 // Generacion de los objetos que se van a usar en la api
