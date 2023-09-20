@@ -1,11 +1,13 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/maxilovera/go-crud-example/dto"
 	"github.com/maxilovera/go-crud-example/services"
+	"github.com/maxilovera/go-crud-example/utils"
 )
 
 type AulaHandler struct {
@@ -19,7 +21,11 @@ func NewAulaHandler(aulaService services.AulaInterface) *AulaHandler {
 }
 
 func (handler *AulaHandler) ObtenerAulas(c *gin.Context) {
+	user := dto.NewUser(utils.GetUserInfoFromContext(c))
+	//invocamos al método
 	aulas := handler.aulaService.ObtenerAulas()
+	//Agregamos un log para indicar información relevante del resultado
+	log.Printf("[handler:AulaHandler][method:ObtenerAulas][cantidad:%d][user:%s]", len(aulas), user.Codigo)
 
 	c.JSON(http.StatusOK, aulas)
 }

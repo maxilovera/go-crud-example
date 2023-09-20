@@ -1,8 +1,12 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/maxilovera/go-crud-example/clients"
 	"github.com/maxilovera/go-crud-example/handlers"
+	"github.com/maxilovera/go-crud-example/middlewares"
 	"github.com/maxilovera/go-crud-example/repositories"
 	"github.com/maxilovera/go-crud-example/services"
 )
@@ -19,16 +23,30 @@ func main() {
 	//Iniciar rutas
 	mappingRoutes()
 
+	log.Println("Iniciando el servidor...")
 	router.Run(":8080")
 }
 
 func mappingRoutes() {
+	//cliente para api externa
+	var authClient clients.AuthClientInterface
+	authClient = clients.NewAuthClient()
+	//creacion de middleware de autenticacion
+	authMiddleware := middlewares.NewAuthMiddleware(authClient)
+
 	//Listado de rutas
-	router.GET("/aulas", aulaHandler.ObtenerAulas)
-	router.GET("/aulas/:id", aulaHandler.ObtenerAulaPorID)
-	router.POST("/aulas", aulaHandler.InsertarAula)
-	router.PUT("/aulas/:id", aulaHandler.ModificarAula)
-	router.DELETE("/aulas/:id", aulaHandler.EliminarAula)
+	group := router.Group("/aulas")
+	//Uso del middleware para todas las rutas del grupo
+	group.Use(authMiddleware.ValidateToken)
+
+	group.GET("/", aulaHandler.ObtenerAulas)
+	group.GET("/:id", aulaHandler.ObtenerAulaPorID)
+	group.POST("/", aulaHandler.InsertarAula)
+	group.PUT("/:id", aulaHandler.ModificarAula)
+	group.DELETE("/:id", aulaHandler.EliminarAula)
+
+	groupE := router.Group("/escuelas")
+	groupE.GET("/", aulaHandler.ObtenerAulas)
 }
 
 // Generacion de los objetos que se van a usar en la api
@@ -43,4 +61,5 @@ func dependencies() {
 	aulaRepository = repositories.NewAulaRepository(database)
 	aulaService = services.NewAulaService(aulaRepository)
 	aulaHandler = handlers.NewAulaHandler(aulaService)
+
 }
