@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log"
+
 	"github.com/maxilovera/go-crud-example/dto"
 	"github.com/maxilovera/go-crud-example/repositories"
 	"github.com/maxilovera/go-crud-example/utils"
@@ -42,6 +44,8 @@ func (service *AulaService) ObtenerAulaPorID(id string) *dto.Aula {
 	var aula *dto.Aula
 	if err == nil {
 		aula = dto.NewAula(aulaDB)
+	} else {
+		log.Printf("[service:AulaService][method:ObtenerAulaPorId][reason:NOT_FOUND][id:%d]", id)
 	}
 
 	return aula

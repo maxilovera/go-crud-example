@@ -23,7 +23,7 @@ func NewAuthClient() *AuthClient {
 
 func (auth *AuthClient) GetUserInfo(token string) (*responses.UserInfo, error) {
 	//Ruta donde apunta esta invocacion
-	apiUrl := "https://localhost:44322/api/Account/UserInfo"
+	apiUrl := "http://w220066.ferozo.com/tp_prog2/api/Account/UserInfo"
 
 	// Crear un cliente HTTP
 	client := &http.Client{}
