@@ -23,7 +23,9 @@ func NewAulaHandler(aulaService services.AulaInterface) *AulaHandler {
 func (handler *AulaHandler) ObtenerAulas(c *gin.Context) {
 	user := dto.NewUser(utils.GetUserInfoFromContext(c))
 	//invocamos al método
-	aulas := handler.aulaService.ObtenerAulas()
+	filtroNombre := c.Query("nombre")
+	aulas := handler.aulaService.ObtenerAulas(filtroNombre)
+
 	//Agregamos un log para indicar información relevante del resultado
 	log.Printf("[handler:AulaHandler][method:ObtenerAulas][cantidad:%d][user:%s]", len(aulas), user.Codigo)
 

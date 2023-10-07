@@ -4,7 +4,6 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/maxilovera/go-crud-example/clients"
 	"github.com/maxilovera/go-crud-example/handlers"
 	"github.com/maxilovera/go-crud-example/middlewares"
 	"github.com/maxilovera/go-crud-example/repositories"
@@ -28,16 +27,20 @@ func main() {
 }
 
 func mappingRoutes() {
+	//middleware para permitir peticiones del mismo server localhost
+
 	//cliente para api externa
-	var authClient clients.AuthClientInterface
-	authClient = clients.NewAuthClient()
+	//var authClient clients.AuthClientInterface
+	//authClient = clients.NewAuthClient()
 	//creacion de middleware de autenticacion
-	authMiddleware := middlewares.NewAuthMiddleware(authClient)
+	//authMiddleware := middlewares.NewAuthMiddleware(authClient)
 
 	//Listado de rutas
 	group := router.Group("/aulas")
 	//Uso del middleware para todas las rutas del grupo
-	group.Use(authMiddleware.ValidateToken)
+	//group.Use(authMiddleware.ValidateToken)
+
+	group.Use(middlewares.CORSMiddleware())
 
 	group.GET("/", aulaHandler.ObtenerAulas)
 	group.GET("/:id", aulaHandler.ObtenerAulaPorID)

@@ -9,7 +9,7 @@ import (
 )
 
 type AulaInterface interface {
-	ObtenerAulas() []*dto.Aula
+	ObtenerAulas(filtroNombre string) []*dto.Aula
 	ObtenerAulaPorID(id string) *dto.Aula
 	EliminarAula(id string) bool
 	InsertarAula(aula *dto.Aula) bool
@@ -26,7 +26,7 @@ func NewAulaService(aulaRepository repositories.AulaRepositoryInterface) *AulaSe
 	}
 }
 
-func (service *AulaService) ObtenerAulas() []*dto.Aula {
+func (service *AulaService) ObtenerAulas(filtroNombre string) []*dto.Aula {
 	aulasDB, _ := service.aulaRepository.ObtenerAulas()
 
 	var aulas []*dto.Aula
@@ -34,6 +34,8 @@ func (service *AulaService) ObtenerAulas() []*dto.Aula {
 		aula := dto.NewAula(aulaDB)
 		aulas = append(aulas, aula)
 	}
+
+	//Filtrar por filtroNombre
 
 	return aulas
 }
