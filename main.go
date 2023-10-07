@@ -1,8 +1,13 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
-	"github.com/maxilovera/objects/handlers"
+	"github.com/maxilovera/go-crud-example/handlers"
+	"github.com/maxilovera/go-crud-example/middlewares"
+	"github.com/maxilovera/go-crud-example/repositories"
+	"github.com/maxilovera/go-crud-example/services"
 )
 
 var (
@@ -13,18 +18,51 @@ var (
 func main() {
 	router = gin.Default()
 	//Iniciar objetos de handler
-	iniciar()
+	dependencies()
+	//Iniciar rutas
+	mappingRoutes()
 
-	mapping()
-
+	log.Println("Iniciando el servidor...")
 	router.Run(":8080")
 }
 
-func mapping() {
+func mappingRoutes() {
+	//middleware para permitir peticiones del mismo server localhost
+
+	//cliente para api externa
+	//var authClient clients.AuthClientInterface
+	//authClient = clients.NewAuthClient()
+	//creacion de middleware de autenticacion
+	//authMiddleware := middlewares.NewAuthMiddleware(authClient)
+
 	//Listado de rutas
-	router.GET("/aulas", aulaHandler.ObtenerAulas)
+	group := router.Group("/aulas")
+	//Uso del middleware para todas las rutas del grupo
+	//group.Use(authMiddleware.ValidateToken)
+
+	group.Use(middlewares.CORSMiddleware())
+
+	group.GET("/", aulaHandler.ObtenerAulas)
+	group.GET("/:id", aulaHandler.ObtenerAulaPorID)
+	group.POST("/", aulaHandler.InsertarAula)
+	group.PUT("/:id", aulaHandler.ModificarAula)
+	group.DELETE("/:id", aulaHandler.EliminarAula)
+
+	groupE := router.Group("/escuelas")
+	groupE.GET("/", aulaHandler.ObtenerAulas)
 }
 
-func iniciar() {
-	aulaHandler = handlers.NewAulaHandler()
+// Generacion de los objetos que se van a usar en la api
+func dependencies() {
+	//Definicion de variables de interface
+	var database repositories.DB
+	var aulaRepository repositories.AulaRepositoryInterface
+	var aulaService services.AulaInterface
+
+	//Creamos los objetos reales y los pasamos como parametro
+	database = repositories.NewMongoDB()
+	aulaRepository = repositories.NewAulaRepository(database)
+	aulaService = services.NewAulaService(aulaRepository)
+	aulaHandler = handlers.NewAulaHandler(aulaService)
+
 }
