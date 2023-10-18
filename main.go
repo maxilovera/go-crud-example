@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
+	"github.com/maxilovera/go-crud-example/clients"
 	"github.com/maxilovera/go-crud-example/handlers"
 	"github.com/maxilovera/go-crud-example/middlewares"
 	"github.com/maxilovera/go-crud-example/repositories"
@@ -28,28 +29,23 @@ func main() {
 
 func mappingRoutes() {
 	//middleware para permitir peticiones del mismo server localhost
+	router.Use(middlewares.CORSMiddleware())
 
 	//cliente para api externa
-	//var authClient clients.AuthClientInterface
-	//authClient = clients.NewAuthClient()
+	var authClient clients.AuthClientInterface
+	authClient = clients.NewAuthClient()
 	//creacion de middleware de autenticacion
-	//authMiddleware := middlewares.NewAuthMiddleware(authClient)
+	authMiddleware := middlewares.NewAuthMiddleware(authClient)
 
 	//Listado de rutas
-	group := router.Group("/aulas")
 	//Uso del middleware para todas las rutas del grupo
-	//group.Use(authMiddleware.ValidateToken)
+	router.Use(authMiddleware.ValidateToken)
 
-	group.Use(middlewares.CORSMiddleware())
-
-	group.GET("/", aulaHandler.ObtenerAulas)
-	group.GET("/:id", aulaHandler.ObtenerAulaPorID)
-	group.POST("/", aulaHandler.InsertarAula)
-	group.PUT("/:id", aulaHandler.ModificarAula)
-	group.DELETE("/:id", aulaHandler.EliminarAula)
-
-	groupE := router.Group("/escuelas")
-	groupE.GET("/", aulaHandler.ObtenerAulas)
+	router.GET("/aulas", aulaHandler.ObtenerAulas)
+	router.GET("/aulas/:id", aulaHandler.ObtenerAulaPorID)
+	router.POST("/aulas", aulaHandler.InsertarAula)
+	router.PUT("/aulas/:id", aulaHandler.ModificarAula)
+	router.DELETE("/aulas/:id", aulaHandler.EliminarAula)
 }
 
 // Generacion de los objetos que se van a usar en la api
